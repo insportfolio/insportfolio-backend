@@ -1,0 +1,196 @@
+basePath: /api/
+definitions:
+  schemas.GetPortfolioResponse:
+    properties:
+      active:
+        type: boolean
+      comments_count:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      preview:
+        type: string
+      profile_id:
+        type: integer
+      reactions_count:
+        type: integer
+      technologies:
+        items:
+          $ref: '#/definitions/schemas.Technology'
+        type: array
+      updated_at:
+        type: string
+      url:
+        type: string
+      views:
+        type: integer
+    type: object
+  schemas.Portfolio:
+    properties:
+      active:
+        type: boolean
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      preview:
+        type: string
+      profile_id:
+        type: integer
+      technologies:
+        items:
+          $ref: '#/definitions/schemas.Technology'
+        type: array
+      updated_at:
+        type: string
+      url:
+        type: string
+      views:
+        type: integer
+    type: object
+  schemas.ProfileSchema:
+    properties:
+      description:
+        type: string
+      full_name:
+        type: string
+      open_to_work:
+        type: boolean
+      profession:
+        type: string
+      propic:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  schemas.Technology:
+    properties:
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Insportfolio Api Docs
+  title: Insportfolio Docs
+  version: 0.0.1
+paths:
+  /portfolios/:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 'The portfolio is added to the list of portfolios of the profile
+        and the others are setted as active: false'
+      parameters:
+      - description: Portfolio URL
+        in: formData
+        name: url
+        required: true
+        type: string
+      - description: Portfolio preview image
+        in: formData
+        name: preview
+        required: true
+        type: file
+      - description: Technologies used
+        in: formData
+        name: technologies
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Portfolio'
+      security:
+      - ApiKeyAuth: []
+      summary: Create portfolio and upload file to AWS
+      tags:
+      - Portfolios
+    put:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Portfolio URL
+        in: formData
+        name: url
+        required: true
+        type: string
+      - description: Portfolio preview image
+        in: formData
+        name: preview
+        required: true
+        type: file
+      - description: Technologies used
+        in: formData
+        name: technologies
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Portfolio'
+      security:
+      - ApiKeyAuth: []
+      summary: Update profile activated portfolio
+      tags:
+      - Portfolios
+  /portfolios/{profile_id}:
+    get:
+      description: Get portfolio by Profile id, the views counter is incremented only
+        if the user is logged and is not the owner
+      parameters:
+      - description: profile_id
+        in: path
+        name: profile_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.GetPortfolioResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Portfolio by Profile id
+      tags:
+      - Portfolios
+  /users/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get a string by ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.ProfileSchema'
+      security:
+      - ApiKeyAuth: []
+      summary: Return authenticated user profile
+      tags:
+      - Users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: x-auth-key
+    type: apiKey
+swagger: "2.0"
